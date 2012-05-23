@@ -94,6 +94,53 @@ public class Autowix {
 
   private static void transform(XmlTextReader xin, XmlTextWriter xout,
                                 Dictionary<string,string> guids) {
+    try {
+      while (xin.Read()) {
+        if (xin.NodeType == XmlNodeType.Element) {
+          string name = xin.Name;
+          bool empty = xin.IsEmptyElement;
+          //Extract attributes
+          KeyValuePair<string,string>[] attr =
+            new KeyValuePair<string,string>[xin.HasAttributes?
+                                            xin.AttributeCount : 0];
+          for (int i = 0; i < attr.Length; ++i) {
+            xin.MoveToAttribute(i);
+            attr[i] = new KeyValuePair<string,string>(xin.Name, xin.Value);
+          }
+
+          //Perform GUID translation
+          translateGUIDs(attr, guids);
+
+          //Write new node(s)
+          if (name == "autowixfilecomponents")
+            writeFileComponents(name, attr, empty, guids);
+          else
+            writeVerbatim(name, attr, empty);
+        } else if (xin.NodeType == XmlNodeType.EndElement) {
+          xout.WriteEndElement();
+        }
+      }
+    } catch (XmlException e) {
+      // TODO
+    }
+  }
+
+  private static void translateGUIDs(KeyValuePair<string,string>[] attrs,
+                                     Dictionary<string,string> guids) {
+    // TODO
+  }
+
+  private static void writeFileComponents(string name,
+                                          KeyValuePair<string,string>[] attrs,
+                                          bool empty,
+                                          Dictionary<string,string> guids) {
+    // TODO
+  }
+
+  private static void writeVerbatim(string name,
+                                    KeyValuePair<string,string>[] attrs,
+                                    bool empty) {
+    // TODO
   }
 
   static int Main(string[] args) {
