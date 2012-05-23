@@ -35,7 +35,7 @@ public class Autowix {
       return 2;
     }
 
-    Dictionary<string,string> persistence = readPersistenceFile(persistenceFile);
+    Dictionary<string,string> persistence=readPersistenceFile(persistenceFile);
 
     transform(xin, xout, persistence);
 
@@ -51,16 +51,18 @@ public class Autowix {
       int lineNum = 0;
       using (TextReader tin = new StreamReader(
                  new FileStream(infile, FileMode.Open, FileAccess.Read))) {
-        string line = tin.ReadLine();
-        ++lineNum;
-        string[] parts = line.Split(new char[] { ' ' });
-        if (parts.Length != 2) {
-          Console.WriteLine("Error: " + infile + ":" +
-                            lineNum + ": malformed input");
-          Environment.Exit(3);
-        }
+        string line;
+        while (null != (line = tin.ReadLine())) {
+          ++lineNum;
+          string[] parts = line.Split(new char[] { ' ' });
+          if (parts.Length != 2) {
+            Console.WriteLine("Error: " + infile + ":" +
+                              lineNum + ": malformed input");
+            Environment.Exit(3);
+          }
 
-        map[parts[0]] = parts[1];
+          map[parts[0]] = parts[1];
+        }
       }
     } catch (FileNotFoundException e) {
       Console.WriteLine("Note: " + infile + " does not exist.");
@@ -74,7 +76,20 @@ public class Autowix {
   }
 
   private static void writePersistenceFile(string outfile,
-                                           Dictionary<string,string> persistence) {
+                                           Dictionary<string,string> map) {
+    try {
+      using (TextWriter tout = new StreamWriter(
+             new FileStream(outfile, FileMode.OpenOrCreate,
+                            FileAccess.Write))) {
+        foreach (KeyValuePair<string,string> kv in map) {
+          tout.WriteLine(kv.Key + " " + kv.Value);
+        }
+      }
+    } catch (IOException e) {
+      Console.WriteLine("Error: Could not write to " + outfile +
+                        ": " + e.Message);
+      Console.WriteLine("Generated GUIDs have NOT been saved!");
+    }
   }
 
   private static void transform(XmlTextReader xin, XmlTextWriter xout,
