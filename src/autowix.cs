@@ -9,10 +9,11 @@ public class Autowix {
   }
 
   private static int run(string infile) {
+    infile = Path.GetFullPath(infile);
     string basename = Path.GetDirectoryName(infile) + "\\" +
       Path.GetFileNameWithoutExtension(infile);
     string persistenceFile = basename + ".awxg";
-    string outfile = basename = ".wxs";
+    string outfile = basename + ".wxs";
 
     XmlTextReader xin;
     XmlTextWriter xout;
@@ -44,7 +45,32 @@ public class Autowix {
   }
 
   private static Dictionary<string,string> readPersistenceFile(string infile) {
-    return null;
+    Dictionary<string, string> map = new Dictionary<string, string>();
+
+    try {
+      int lineNum = 0;
+      using (TextReader tin = new StreamReader(
+                 new FileStream(infile, FileMode.Open, FileAccess.Read))) {
+        string line = tin.ReadLine();
+        ++lineNum;
+        string[] parts = line.Split(new char[] { ' ' });
+        if (parts.Length != 2) {
+          Console.WriteLine("Error: " + infile + ":" +
+                            lineNum + ": malformed input");
+          Environment.Exit(3);
+        }
+
+        map[parts[0]] = parts[1];
+      }
+    } catch (FileNotFoundException e) {
+      Console.WriteLine("Note: " + infile + " does not exist.");
+      Console.WriteLine("Note: All GUIDs will be newly generated.");
+    } catch (IOException e) {
+      Console.WriteLine("Error: Reading " + infile + ": " + e.Message);
+      Environment.Exit(3);
+    }
+
+    return map;
   }
 
   private static void writePersistenceFile(string outfile,
