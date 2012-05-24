@@ -111,11 +111,11 @@ public class Autowix {
           }
 
           //Perform GUID translation
-          translateGUIDs(attr, guids);
+          translateGUIDs(attr, guids, xin);
 
           //Write new node(s)
           if (name == "autowixfilecomponents")
-            writeFileComponents(xout, name, attr, empty, guids);
+            writeFileComponents(xout, name, attr, empty, guids, xin);
           else
             writeVerbatim(xout, name, attr, empty);
         } else if (xin.NodeType == XmlNodeType.EndElement) {
@@ -129,19 +129,22 @@ public class Autowix {
   }
 
   private static void translateGUIDs(KeyValuePair<string,string>[] attrs,
-                                     Dictionary<string,string> guids) {
+                                     Dictionary<string,string> guids,
+                                     XmlTextReader xin) {
     for (int i = 0; i < attrs.Length; ++i) {
       KeyValuePair<string,string> attr = attrs[i];
       if (attr.Value.StartsWith("autowix:guid:")) {
         //Disallow line breaks in GUID identifiers
         if (attr.Value.Contains("\n") || attr.Value.Contains("\r")) {
-          Console.WriteLine("Error: GUID name containing a line break");
+          Console.WriteLine("Error: Line {0}: GUID id containing a line break",
+                            xin.LineNumber);
           Environment.Exit(6);
         }
         //Spaces cannot be used in GUID identifiers.
         //If any are found, replace with underscores and issue a warning.
         if (attr.Value.Contains(" ")) {
-          Console.WriteLine("Warning: GUID id may not contain spaces.");
+          Console.WriteLine("Warning: {0}: GUID id may not contain spaces.",
+                            xin.LineNumber);
           Console.WriteLine("Warning: Converting spaces to underscores.");
           string newValue = attr.Value.Replace(' ', '_');
           Console.WriteLine("Warning: {0} => {1}", attr.Value, newValue);
@@ -164,7 +167,8 @@ public class Autowix {
   private static void writeFileComponents(XmlTextWriter xout, string name,
                                           KeyValuePair<string,string>[] attrs,
                                           bool empty,
-                                          Dictionary<string,string> guids) {
+                                          Dictionary<string,string> guids,
+                                          XmlTextReader xin) {
     // TODO
   }
 
