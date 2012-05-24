@@ -113,9 +113,9 @@ public class Autowix {
 
           //Write new node(s)
           if (name == "autowixfilecomponents")
-            writeFileComponents(name, attr, empty, guids);
+            writeFileComponents(xout, name, attr, empty, guids);
           else
-            writeVerbatim(name, attr, empty);
+            writeVerbatim(xout, name, attr, empty);
         } else if (xin.NodeType == XmlNodeType.EndElement) {
           xout.WriteEndElement();
         }
@@ -142,17 +142,21 @@ public class Autowix {
     }
   }
 
-  private static void writeFileComponents(string name,
+  private static void writeFileComponents(XmlTextWriter xout, string name,
                                           KeyValuePair<string,string>[] attrs,
                                           bool empty,
                                           Dictionary<string,string> guids) {
     // TODO
   }
 
-  private static void writeVerbatim(string name,
+  private static void writeVerbatim(XmlTextWriter xout, string name,
                                     KeyValuePair<string,string>[] attrs,
                                     bool empty) {
-    // TODO
+    xout.WriteStartElement(name);
+    foreach (KeyValuePair<string,string> attr in attrs)
+      xout.WriteAttributeString(attr.Key, attr.Value);
+    if (empty)
+      xout.WriteEndElement();
   }
 
   static int Main(string[] args) {
