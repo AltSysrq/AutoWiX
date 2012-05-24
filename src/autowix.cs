@@ -38,6 +38,8 @@ public class Autowix {
     Dictionary<string,string> persistence=readPersistenceFile(persistenceFile);
 
     transform(xin, xout, persistence);
+    xout.Flush();
+    xout.Close();
 
     writePersistenceFile(persistenceFile, persistence);
 
@@ -121,7 +123,8 @@ public class Autowix {
         }
       }
     } catch (XmlException e) {
-      // TODO
+      Console.WriteLine("Error reading input: " + e.Message);
+      Environment.Exit(5);
     }
   }
 
