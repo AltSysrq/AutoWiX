@@ -30,6 +30,7 @@ public class Autowix {
       xout = new XmlTextWriter(new FileStream(outfile, FileMode.OpenOrCreate,
                                               FileAccess.Write),
                                System.Text.Encoding.UTF8);
+      xout.Formatting = Formatting.Indented;
     } catch (IOException e) {
       Console.WriteLine("Could not open " + outfile + ": " + e.Message);
       return 2;
