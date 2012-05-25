@@ -243,7 +243,6 @@ public class Autowix {
                                                Dictionary<string,string> guids)
   {
     string basename = Path.GetFileName(file);
-    Console.WriteLine(file);
     accumPath += "\\" + basename;
     if (File.Exists(file)) {
       //Create component
