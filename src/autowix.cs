@@ -179,6 +179,30 @@ public class Autowix {
     return guids[key];
   }
 
+  //Converts the given ID so that it is legal.
+  //Illegal characters are converted to _.#._, where # is the base-10
+  //representation of the character.
+  //If the id doens't start with a letter, 'X' is prepended.
+  private static string legaliseId(string id) {
+    string ret = "";
+    foreach (char c in id) {
+      if (c >= 'a' && c <= 'z' ||
+          c >= 'A' && c <= 'Z' ||
+          c >= '0' && c <= '9' ||
+          c == '.' || c == '_')
+        ret += c;
+      else
+        ret += "_." + (int)c + "._";
+    }
+
+    //Check first character
+    if ((ret[0] <= 'a' || ret[0] >= 'z') &&
+        (ret[0] <= 'A' || ret[0] >= 'Z'))
+      ret = "X" + ret;
+
+    return ret;
+  }
+
   private static void writeFileComponents(XmlTextWriter xout, string name,
                                           KeyValuePair<string,string>[] attrs,
                                           bool empty,
@@ -214,9 +238,9 @@ public class Autowix {
     string accum = "";
     if (dirbase != null) {
       foreach (string subdir in dirbase.Split('\\')) {
-        accum += "\\" + subdir;
+        accum += "_" + subdir;
         xout.WriteStartElement("Directory");
-        xout.WriteAttributeString("Id", idbase + ":dir:" + accum);
+        xout.WriteAttributeString("Id", legaliseId(idbase + ".dir." + accum));
         xout.WriteAttributeString("Name", subdir);
       }
     }
@@ -224,9 +248,9 @@ public class Autowix {
     //Move to root
     string[] rootdirs = dirroot.Split('\\');
     for (int i = 0; i < rootdirs.Length-1; ++i) {
-      accum += "\\" + rootdirs[i];
+      accum += "_" + rootdirs[i];
       xout.WriteStartElement("Directory");
-      xout.WriteAttributeString("Id", idbase + ":dir:" + accum);
+      xout.WriteAttributeString("Id", legaliseId(idbase + ".dir." + accum));
       xout.WriteAttributeString("Name", rootdirs[i]);
     }
 
@@ -247,17 +271,19 @@ public class Autowix {
                                                Dictionary<string,string> guids)
   {
     string basename = Path.GetFileName(file);
-    accumPath += "\\" + basename;
+    accumPath += "_" + basename;
     if (File.Exists(file)) {
       //Create component
       xout.WriteStartElement("Component");
-      xout.WriteAttributeString("Id", idbase + ":comp:" + accumPath);
-      autoComponents.Add(idbase + ":comp:" + accumPath);
+      xout.WriteAttributeString("Id",
+                                legaliseId(idbase + ".comp." + accumPath));
+      autoComponents.Add(legaliseId(idbase + ".comp." + accumPath));
       xout.WriteAttributeString("Guid",
                                 translateGUID(accumPath.Replace(' ','*'),
                                               guids));
       xout.WriteStartElement("File");
-      xout.WriteAttributeString("Id", idbase + ":file:" + accumPath);
+      xout.WriteAttributeString("Id",
+                                legaliseId(idbase + ".file." + accumPath));
       xout.WriteAttributeString("Name", basename);
       xout.WriteAttributeString("DiskId", "1");
       xout.WriteAttributeString("Source", file);
@@ -267,7 +293,8 @@ public class Autowix {
     } else if (Directory.Exists(file)) {
       //Create directory
       xout.WriteStartElement("Directory");
-      xout.WriteAttributeString("Id", idbase + ":dir:" + accumPath);
+      xout.WriteAttributeString("Id",
+                                legaliseId(idbase + ".dir." + accumPath));
       xout.WriteAttributeString("Name", basename);
 
       //Recurse

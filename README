@@ -15,11 +15,14 @@ exists:
   encountered in a recursive traversal starting from the given root under the
   base directory. Directory elements are created as needed to replicate the
   directory structure (base is not included in this, only from). The ID for each
-  file has the form "IDBASE:file:PATH" and for each component,
-  "IDBASE:comp:PATH". Similarly, directories use "IDBASE:dir:PATH". The GUIDs
+  file has the form "IDBASE.file.PATH" and for each component,
+  "IDBASE.comp.PATH". Similarly, directories use "IDBASE.dir.PATH". The GUIDs
   for each item will be consistent if the same persistence file is used. All
-  paths start with a backslash, and include base. idbase and base are both
-  optional.
+  paths start with an backslash, and include base. idbase and base are both
+  optional. When converting paths to IDs, backslashes are changed to
+  underscores, and illegal characters are converted to "_.#._", where "#" is
+  the base-10 representation of the character. If a generated ID does not start
+  with a letter, an 'X' is implicitly prepended.
 
 + The XML element <autowixcomponentrefs /> will produce ComponentRefs referring
   to every Component generated automatically.
