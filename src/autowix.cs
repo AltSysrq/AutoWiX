@@ -29,7 +29,7 @@ public class Autowix {
     }
 
     try {
-      xout = new XmlTextWriter(new FileStream(outfile, FileMode.OpenOrCreate,
+      xout = new XmlTextWriter(new FileStream(outfile, FileMode.Create,
                                               FileAccess.Write),
                                System.Text.Encoding.UTF8);
       xout.Formatting = Formatting.Indented;
