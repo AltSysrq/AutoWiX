@@ -4,6 +4,8 @@ using System.Xml;
 using System.Collections.Generic;
 
 public class Autowix {
+  private static List<string> autoComponents = new List<String>();
+
   private static void printHelp() {
     System.Console.WriteLine("Usage: autowix infile");
   }
@@ -117,6 +119,8 @@ public class Autowix {
           //Write new node(s)
           if (name == "autowixfilecomponents")
             writeFileComponents(xout, name, attr, empty, guids, xin);
+          else if (name == "autowixcomponentrefs")
+            writeComponentRefs(xout, empty, xin);
           else
             writeVerbatim(xout, name, attr, empty);
         } else if (xin.NodeType == XmlNodeType.EndElement) {
@@ -248,6 +252,7 @@ public class Autowix {
       //Create component
       xout.WriteStartElement("Component");
       xout.WriteAttributeString("Id", idbase + ":comp:" + accumPath);
+      autoComponents.Add(idbase + ":comp:" + accumPath);
       xout.WriteAttributeString("Guid",
                                 translateGUID(accumPath.Replace(' ','*'),
                                               guids));
@@ -274,6 +279,21 @@ public class Autowix {
     } else {
       Console.WriteLine("Error: File \"{0}\" not found.", file);
       Environment.Exit(8);
+    }
+  }
+
+  private static void writeComponentRefs(XmlTextWriter xout, bool empty,
+                                         XmlTextReader xin) {
+    if (!empty) {
+      Console.WriteLine("Error: Line {0}: <autowixcomponentrefs> not empty",
+                        xin.LineNumber);
+      Environment.Exit(7);
+    }
+
+    foreach (string c in autoComponents) {
+      xout.WriteStartElement("ComponentRef");
+      xout.WriteAttributeString("Id", c);
+      xout.WriteEndElement();
     }
   }
 

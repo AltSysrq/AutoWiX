@@ -21,6 +21,9 @@ exists:
   paths start with a backslash, and include base. idbase and base are both
   optional.
 
++ The XML element <autowixcomponentrefs /> will produce ComponentRefs referring
+  to every Component generated automatically.
+
 Since GUIDs must be consistent, AutoWiX stores information about them in a file
 named PROJECT.awxg, where PROJECT is the base name of the input file. The
 contents of this file is not defined, but it is textual. Since this file
